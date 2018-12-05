@@ -6,3 +6,13 @@ cache: npm
 script:
   - set -e
   - npm run build
+
+deploy:
+  skip_cleanup: true
+  provider: npm
+  email: demon@danwi.me
+  api_key:
+    secure: T4uKJ1mkZpbZPYEC0njnSaf+mSWmbTJID8qr4SupOEVlJi0YyKPC+Ask7LWJwxrcsoVjfEWgZGzkcwwaCOx/ydyHeTw3p6X7Oqx53DwWvYee5ffIu9TTIjLyq1EnsAxCEfa6qXMproFIoYZmUDOH8lukFiujNhB3Dm+PGJi2g7Cow8D8P3GHaNl2YFiBAF/NAWDa+F9mU1tSzNzKVWza9vD0xgzCLkblWfRS4AMonTWgIDbsqt/fWwX+jII9hCZCTClo7wEzal3npuUbtqmcpjTVkHDs6ru+XwAuiIUdEAVxFi+RC6nHwYg8HjKHWU64wgZQJ9HWMNJjfC3hPJV+H+64bPkI3ZzCVTwirgsQgQxDc+yUodtTxlgpJUmVB4lJsKTbDnXbIlvQZXs0PSSP2CCzD7rxseuuqaYjp8aSvR8WKsMSvOTfeGzX11U4CHmIMmSwDiR/YU9d7tQE0vzCRurBsB62USTTgy1TmuCvyvx1fAlQMtNW9fq+2j6Oe5kOn1vJ80HU3VOeIW0a5ndKCx2GKri4jWTstfD3ldwY4eVrQQM3pH6ouzC/1kQRarrHiAzuamNnTaVMlAgSHNlYEjwPJeerPgMGQMhfLJVsNCiXpO4r028crSN3C1t2m6snuM+lYkQA6flxuuT0c1u/g4+QtVcGdNiJRFQ27KAN55M=
+  on:
+    tags: true
+    repo: kato/kato-client-js
