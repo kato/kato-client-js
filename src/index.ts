@@ -24,6 +24,9 @@ export type Stub = {
   modules: Module[]
 }
 
+//存根缓存
+const stubCache = {};
+
 export class KatoClient {
   private readonly interceptorContainer = new InterceptorContainer();
   use = this.interceptorContainer.use.bind(this.interceptorContainer);
@@ -79,8 +82,13 @@ export class KatoClient {
 
   private async fetchStub(): Promise<Stub> {
     const stubUrl = this.baseUrl + 'stub.json';
-    const res = await this.dispatcher({url: stubUrl});
-    const stubJson = JSON.parse(res.data);
-    return stubJson as Stub
+
+    if (!stubCache[stubUrl]) {
+      const res = await this.dispatcher({url: stubUrl});
+      const stubJson = JSON.parse(res.data);
+      stubCache[stubUrl] = stubJson;
+    }
+
+    return stubCache[stubUrl];
   }
 }
