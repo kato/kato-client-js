@@ -1,39 +1,21 @@
 import {InterceptorContainer} from "./interceptor";
 import {getOptions, KatoClientOptions} from "./options";
 import {Dispatcher} from "./dispatcher";
-
-type API = {
-  [methodName: string]: {
-    [methodName: string]: Function
-  }
-}
-
-export type Parameter = {
-  name: string,
-  type: string
-}
-export type Method = {
-  name: string,
-  parameters: Parameter[]
-}
-export type Module = {
-  name: string,
-  methods: Method[]
-}
-export type Stub = {
-  modules: Module[]
-}
+import {Parameter, Stub} from "./stub";
 
 //存根缓存
 const stubCache = {};
 
 export class KatoClient {
-  private readonly interceptorContainer = new InterceptorContainer();
-  use = this.interceptorContainer.use.bind(this.interceptorContainer);
+  private readonly interceptors = new InterceptorContainer();
+  use = this.interceptors.use.bind(this.interceptors);
 
   public readonly baseUrl: string;
   public readonly options: KatoClientOptions;
   public readonly dispatcher: Dispatcher;
+
+  //是否已经初始化过了
+  private inited = false;
 
   constructor()
   constructor(baseUrl: string)
@@ -60,18 +42,19 @@ export class KatoClient {
   }
 
   //初始化客户端,并返回一个api集合
-  async init(): Promise<API> {
-    //获取存根信息
-    const stub = await this.fetchStub();
-    const apis = {};
-    for (const moduleStub of stub.modules) {
-      const module = {};
-      for (const methodStub of moduleStub.methods) {
-        module[methodStub.name] = this.generateInvoker(moduleStub.name, methodStub.name, methodStub.parameters);
+  async init(): Promise<void> {
+    if (!this.inited) {
+      //获取存根信息
+      const stub = await this.fetchStub();
+      for (const moduleStub of stub.modules) {
+        const module = {};
+        for (const methodStub of moduleStub.methods) {
+          module[methodStub.name] = this.generateInvoker(moduleStub.name, methodStub.name, methodStub.parameters);
+        }
+        this[moduleStub.name] = module;
       }
-      apis[moduleStub.name] = module;
+      this.inited = true
     }
-    return apis;
   }
 
   private generateInvoker(moduleName: string, methodName: string, parameters: Parameter[]): Function {
@@ -91,4 +74,8 @@ export class KatoClient {
 
     return stubCache[stubUrl];
   }
+
+  [methodName: string]: {
+    [methodName: string]: Function
+  } | any
 }
