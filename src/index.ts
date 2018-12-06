@@ -79,3 +79,6 @@ export class KatoClient {
     [methodName: string]: Function
   } | any
 }
+
+
+export * from './errors'
