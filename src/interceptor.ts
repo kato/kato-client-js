@@ -22,7 +22,7 @@ export class InterceptorContainer {
     let currentInterceptorIndex = 0;
 
     const next = async () => {
-      const nextInterceptor = this.interceptors[currentInterceptorIndex];
+      const nextInterceptor = this.interceptors[currentInterceptorIndex++];
 
       if (typeof nextInterceptor === "function") {
         await nextInterceptor.call(null, ctx, next);
