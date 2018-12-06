@@ -1,5 +1,8 @@
 //kato 错误基类
 export class KatoError extends Error {
+  //远程服务器上的堆栈错误
+  public remoteStack: string;
+
   constructor(message: string = "未知错误", public code: number) {
     super(message);
     this.name = "KatoError"

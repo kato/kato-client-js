@@ -1,7 +1,11 @@
-import {InterceptorContainer} from "./interceptor";
+import * as queryString from 'query-string'
+import {Context, InterceptorContainer} from "./interceptor";
 import {getOptions, KatoClientOptions} from "./options";
 import {Dispatcher} from "./dispatcher";
 import {Parameter, Stub} from "./stub";
+import {jsonParse, jsonStringify} from "./json";
+import {KatoCommonError, KatoError, KatoLogicError, KatoRuntimeError} from "./errors";
+
 
 //存根缓存
 const stubCache = {};
@@ -58,8 +62,78 @@ export class KatoClient {
   }
 
   private generateInvoker(moduleName: string, methodName: string, parameters: Parameter[]): Function {
-    return async function () {
+    const that = this;
+    return async function (...args: any[]) {
+      let resJson;
+      try {
+        //获取到所有的参数
+        const data = {};
+        //针对参数做映射
+        args.forEach((it, index) => {
+          if (parameters[index]) {
+            data[parameters[index].name] = jsonStringify(it);
+          }
+        });
+        const ctx: Context = {
+          client: that,
+          req: {
+            url: `${that.baseUrl}${moduleName}/${methodName}.ac`,
+            data: queryString.stringify(data),
+            headers: {
+              'content-type': 'application/x-www-form-urlencoded'
+            }
+          },
+          res: null
+        };
 
+        //交给拦截器去处理
+        await that.interceptors.do(ctx);
+
+        //快速处理掉通用的错误
+        if (ctx.res.statusCode !== 200)
+          throw new KatoRuntimeError(`错误的HTTP状态码: ${ctx.res.statusCode}`);
+
+        //如果返回的是空'',则直接返回未定义
+        if (ctx.res.data === '')
+          return undefined;
+
+        //解析服务器上过来的结果
+        resJson = jsonParse(ctx.res.data)
+      } catch (e) {
+        let err = e;
+        if (!(e instanceof KatoError)) {
+          //如果不是一个KatoError,可以将它转化为KatoError
+          err = new KatoRuntimeError(e.message);
+          err.stack = e.stack || '';
+        }
+        throw err
+      }
+
+      //将json做解析
+      if (
+        resJson &&
+        resJson.hasOwnProperty('_KatoErrorCode_') &&
+        resJson.hasOwnProperty('_KatoErrorMessage_') &&
+        resJson.hasOwnProperty('_KatoErrorStack_')
+      ) {
+        //构造kato异常
+        const code = resJson['_KatoErrorCode_'];
+        const message = resJson['_KatoErrorMessage_'];
+        const remoteStack = resJson['_KatoErrorStack_'];
+        let err;
+        if (code === -1)
+          err = new KatoRuntimeError(message);
+        else if (code === 0)
+          err = new KatoCommonError(message);
+        else
+          err = new KatoLogicError(message, code);
+        err.remoteStack = remoteStack;
+
+        //抛出
+        throw err
+      } else {
+        return resJson
+      }
     }
   }
 
