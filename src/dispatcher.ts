@@ -4,7 +4,7 @@ export type HttpRequest = {
   url: string,
   data?: {
     [key: string]: any
-  },
+  } | string,
   headers?: {
     [header: string]: string | string[] | undefined
   }
@@ -27,6 +27,7 @@ export async function defaultDispatcher(req: HttpRequest): Promise<HttpResponse>
     method: "post",
     url: req.url,
     data: req.data,
+    headers: req.headers,
     transformResponse: data => data
   });
 
