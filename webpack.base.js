@@ -1,3 +1,4 @@
+const nodeExternals = require('webpack-node-externals');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
@@ -17,6 +18,7 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
   },
+  externals: [nodeExternals()],
   plugins: [
     new CleanWebpackPlugin(['dist'])
   ]
