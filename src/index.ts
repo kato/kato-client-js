@@ -17,6 +17,7 @@ export class KatoClient {
   public readonly baseUrl: string;
   public readonly options: KatoClientOptions;
   public readonly dispatcher: Dispatcher;
+  public stub: Stub;
 
   //是否已经初始化过了
   private inited = false;
@@ -49,8 +50,8 @@ export class KatoClient {
   async init(): Promise<void> {
     if (!this.inited) {
       //获取存根信息
-      const stub = await this.fetchStub();
-      for (const moduleStub of stub.modules) {
+      this.stub = await this.fetchStub();
+      for (const moduleStub of this.stub.modules) {
         const module = {};
         for (const methodStub of moduleStub.methods) {
           module[methodStub.name] = this.generateInvoker(moduleStub.name, methodStub.name, methodStub.parameters);
