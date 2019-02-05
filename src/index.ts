@@ -141,10 +141,9 @@ export class KatoClient {
   private async fetchStub(): Promise<Stub> {
     const stubUrl = this.baseUrl + 'stub.json';
 
-    if (!stubCache[stubUrl]) {
+    if (!stubCache[stubUrl] || !this.options.cacheStub) {
       const res = await this.dispatcher({url: stubUrl});
-      const stubJson = JSON.parse(res.data);
-      stubCache[stubUrl] = stubJson;
+      stubCache[stubUrl] = JSON.parse(res.data);
     }
 
     return stubCache[stubUrl];

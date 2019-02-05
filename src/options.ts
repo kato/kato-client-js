@@ -3,10 +3,12 @@ import {defaultDispatcher, Dispatcher} from "./dispatcher";
 
 export type KatoClientOptions = {
   dispatcher?: Dispatcher
+  cacheStub?: boolean
 }
 
 const defaultOptions: KatoClientOptions = {
-  dispatcher: defaultDispatcher
+  dispatcher: defaultDispatcher,
+  cacheStub: true,
 };
 
 export function getOptions(options: KatoClientOptions): KatoClientOptions {
