@@ -4,7 +4,7 @@ import {getOptions, KatoClientOptions} from "./options";
 import {Dispatcher} from "./dispatcher";
 import {Parameter, Stub} from "./stub";
 import {jsonParse, jsonStringify} from "./json";
-import {KatoCommonError, KatoError, KatoLogicError, KatoRuntimeError} from "./errors";
+import {KatoAuthError, KatoCommonError, KatoError, KatoLogicError, KatoRuntimeError, KatoValidateError} from "./error";
 
 
 //存根缓存
@@ -121,13 +121,23 @@ export class KatoClient {
         const code = resJson['_KatoErrorCode_'];
         const message = resJson['_KatoErrorMessage_'];
         const remoteStack = resJson['_KatoErrorStack_'];
-        let err;
-        if (code === -1)
-          err = new KatoRuntimeError(message);
-        else if (code === 0)
-          err = new KatoCommonError(message);
-        else
-          err = new KatoLogicError(message, code);
+        let err: KatoError;
+        switch (code) {
+          case -3:
+            err = new KatoValidateError(message);
+            break;
+          case -2:
+            err = new KatoAuthError(message);
+            break;
+          case -1:
+            err = new KatoRuntimeError(message);
+            break;
+          case 0:
+            err = new KatoCommonError(message);
+            break;
+          default:
+            err = new KatoLogicError(message, code);
+        }
         err.remoteStack = remoteStack;
 
         //抛出
@@ -155,4 +165,4 @@ export class KatoClient {
 }
 
 
-export * from './errors'
+export * from './error'

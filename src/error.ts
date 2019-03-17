@@ -37,3 +37,20 @@ export class KatoRuntimeError extends KatoError {
     this.name = 'KatoRuntimeError';
   }
 }
+
+//权限验证异常
+export class KatoAuthError extends KatoError {
+  constructor(message: string = "不具备调用权限") {
+    super(message, -2);
+    this.name = 'KatoAuthError';
+  }
+}
+
+//参数验证异常
+export class KatoValidateError extends KatoError {
+  constructor(message: string = "非法的API参数调用") {
+    super(message, -3);
+    this.name = 'KatoValidateError';
+  }
+}
+
