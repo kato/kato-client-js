@@ -1,4 +1,4 @@
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -18,6 +18,6 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js']
   },
   plugins: [
-    new CleanWebpackPlugin(['dist'])
+    new CleanWebpackPlugin()
   ]
 };
