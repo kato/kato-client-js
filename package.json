@@ -1,6 +1,6 @@
 {
   "name": "kato-client",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "kato client for javascript",
   "main": "dist/index.js",
   "files": [
