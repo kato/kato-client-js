@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosHeaders} from 'axios';
 
 export type HttpRequest = {
   url: string,
@@ -15,7 +15,7 @@ export type HttpResponse = {
   statusCode: number,
   data: string,
   headers: {
-    [header: string]: string | string[] | undefined
+    [header: string]: AxiosHeaders | string | string[] | number | boolean | null;
   }
 }
 
